@@ -32,4 +32,4 @@
 
 ## 演示
 
-![](https://github.com/shucc/StatusBarUtil/tree/master/app/image/test.gif)
+![](https://github.com/shucc/StatusBarUtil/blob/master/image/test.gif)
