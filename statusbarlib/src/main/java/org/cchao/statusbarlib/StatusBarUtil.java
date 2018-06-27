@@ -22,36 +22,40 @@ public class StatusBarUtil {
      * 设置全透明状态栏
      */
     public static void setTransparentStatusBar(Activity activity) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = activity.getWindow();
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            //状态栏透明
-            activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            setSemitransparentStatusBar(activity);
         }
     }
 
-    public static void setStatusBarColor(Activity activity, int color) {
-        setStatusBarColor(activity, color, true);
+    /**
+     * 设置半透明状态栏
+     *
+     * @param activity
+     */
+    public static void setSemitransparentStatusBar(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
     }
 
     /**
-     * 设置StatusBar颜色
+     * 设置状态栏颜色
+     *
      * @param activity
-     * @param color
-     *      StatusBar颜色
-     * @param isSetStatusColor
-     *      是否改变StatusBar颜色
+     * @param color    StatusBar颜色
      */
-    public static void setStatusBarColor(Activity activity, int color, boolean isSetStatusColor) {
+    public static void setStatusBarColor(Activity activity, int color) {
         //透明默认和白色一样处理
         if (color == Color.TRANSPARENT) {
             color = Color.WHITE;
         }
-        if (isSetStatusColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (color == Color.WHITE && MIUISetStatusBarLightMode(activity.getWindow(), true)) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     activity.getWindow().setStatusBarColor(Color.WHITE);
@@ -79,15 +83,34 @@ public class StatusBarUtil {
             } else {
                 activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    //5.0以上白色和透明色则设置StatusBar颜色为默认颜色
-                    activity.getWindow().setStatusBarColor(color == Color.WHITE ? Color.BLACK : color);
+                    activity.getWindow().setStatusBarColor(color);
                 } else {
                     activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                     SystemBarTintManager tintManager = new SystemBarTintManager(activity);
                     tintManager.setStatusBarTintEnabled(true);
-                    tintManager.setStatusBarTintColor(color == Color.WHITE ? Color.BLACK : color);
+                    tintManager.setStatusBarTintColor(color);
                 }
             }
+        }
+    }
+
+    /**
+     * 设置状态栏图标及文字样式
+     *
+     * @param activity
+     * @param isLight
+     */
+    public static void setStatusBarLightModel(Activity activity, boolean isLight) {
+        if (MIUISetStatusBarLightMode(activity.getWindow(), isLight)) {
+            return;
+        }
+        if (FlymeSetStatusBarLightMode(activity.getWindow(), isLight)) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            activity.getWindow().getDecorView().setSystemUiVisibility(isLight
+                    ? (View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+                    : View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
     }
 
@@ -134,10 +157,8 @@ public class StatusBarUtil {
         if (window != null) {
             try {
                 WindowManager.LayoutParams lp = window.getAttributes();
-                Field darkFlag = WindowManager.LayoutParams.class
-                        .getDeclaredField("MEIZU_FLAG_DARK_STATUS_BAR_ICON");
-                Field meizuFlags = WindowManager.LayoutParams.class
-                        .getDeclaredField("meizuFlags");
+                Field darkFlag = WindowManager.LayoutParams.class.getDeclaredField("MEIZU_FLAG_DARK_STATUS_BAR_ICON");
+                Field meizuFlags = WindowManager.LayoutParams.class.getDeclaredField("meizuFlags");
                 darkFlag.setAccessible(true);
                 meizuFlags.setAccessible(true);
                 int bit = darkFlag.getInt(null);
