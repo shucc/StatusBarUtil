@@ -16,7 +16,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".StatusBarColorActivity" />
-        <activity android:name=".StatusBarTransparentActivity" />
+        <activity android:name=".StatusBarTransparentActivity"
+            android:windowSoftInputMode="adjustResize"/>
     </application>
 
 </manifest>

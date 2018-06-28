@@ -17,7 +17,7 @@ allprojects {
 在使用库的module中添加:
 ```groovy
 dependencies {
-    implementation 'com.github.shucc:StatusBarUtil:v1.2'
+    implementation 'com.github.shucc:StatusBarUtil:v1.3'
 }
 ```
 

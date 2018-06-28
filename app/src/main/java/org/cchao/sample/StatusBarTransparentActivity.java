@@ -26,8 +26,6 @@ public class StatusBarTransparentActivity extends AppCompatActivity {
         StatusBarUtil.setTransparentStatusBar(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_status_bar_transparent);
-        //带输入框
-        AndroidBug5497Workaround.assistActivity(this);
         findViewById(R.id.btn_one).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

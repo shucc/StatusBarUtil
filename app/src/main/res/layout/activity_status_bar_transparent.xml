@@ -35,15 +35,4 @@
         android:layout_height="wrap_content"
         android:text="状态栏白色图标" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_alignParentBottom="true"/>
-
-    </RelativeLayout>
-
 </LinearLayout>

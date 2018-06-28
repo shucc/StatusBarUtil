@@ -7,8 +7,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.readystatesoftware.systembartint.SystemBarTintManager;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -51,46 +49,30 @@ public class StatusBarUtil {
      * @param color    StatusBar颜色
      */
     public static void setStatusBarColor(Activity activity, int color) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            return;
+        }
         //透明默认和白色一样处理
         if (color == Color.TRANSPARENT) {
             color = Color.WHITE;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (color == Color.WHITE && MIUISetStatusBarLightMode(activity.getWindow(), true)) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    activity.getWindow().setStatusBarColor(Color.WHITE);
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    SystemBarTintManager tintManager = new SystemBarTintManager(activity);
-                    tintManager.setStatusBarTintEnabled(true);
-                    tintManager.setStatusBarTintResource(android.R.color.white);
-                }
-            } else if (color == Color.WHITE && FlymeSetStatusBarLightMode(activity.getWindow(), true)) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    activity.getWindow().setStatusBarColor(Color.WHITE);
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    SystemBarTintManager tintManager = new SystemBarTintManager(activity);
-                    tintManager.setStatusBarTintEnabled(true);
-                    tintManager.setStatusBarTintResource(android.R.color.white);
-                }
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && color == Color.WHITE) {
-                //当且仅当StatusBar为白色时StatusBar中图标文字颜色为黑色
-                activity.getWindow().setStatusBarColor(Color.WHITE);
-                activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        Window window = activity.getWindow();
+        if (color == Color.WHITE) {
+            if (!MIUISetStatusBarLightMode(window, true) && !FlymeSetStatusBarLightMode(window, true) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             } else {
-                activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    activity.getWindow().setStatusBarColor(color);
-                } else {
-                    activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    SystemBarTintManager tintManager = new SystemBarTintManager(activity);
-                    tintManager.setStatusBarTintEnabled(true);
-                    tintManager.setStatusBarTintColor(color);
-                }
+                setSemitransparentStatusBar(activity);
             }
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            activity.getWindow().setStatusBarColor(color);
+        } else {
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            SystemBarTintManager tintManager = new SystemBarTintManager(activity);
+            tintManager.setStatusBarTintEnabled(true);
+            tintManager.setStatusBarTintColor(color);
         }
     }
 
